@@ -1,7 +1,7 @@
 ---
-enable: false
+enable: true
 level: happy
 ---
-我们已经通过 Google Adsense 审核！不出意外，在未开启广告拦截器的情况下，应该已经可以看到广告了
+你好，课表，有事请在没课的时候找我
 
-如果您对广告位置不满意（如：占据面积大，挡住主要内容等情况），请前往 [置顶文章](/posts/pin/) 告知我们！
+![](../assets/images/Screenshot_2026-03-01-18-37-20-12_cb331b166d50c46.jpg)
