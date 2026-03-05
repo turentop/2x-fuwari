@@ -951,7 +951,7 @@ function downloadLink(url: string, filename: string) {
                 </div>
                 
                 {#if searchResults.length > 0}
-                    <div class="grid grid-cols-5 gap-2 mt-2 max-h-40 overflow-y-auto p-2 bg-transparent rounded-lg border border-[var(--line-color)]">
+                    <div class="grid grid-cols-4 gap-2 mt-2 max-h-40 overflow-y-auto p-2 bg-transparent rounded-lg border border-[var(--line-color)]">
                         {#each searchResults as icon}
                             {@const isSelected = icon === iconName}
                             <button 
@@ -960,7 +960,7 @@ function downloadLink(url: string, filename: string) {
                                 title={icon}
                                 aria-pressed={isSelected}
                             >
-                                <div class={`w-8 h-8 rounded-md bg-white border flex items-center justify-center overflow-hidden ${
+                                <div class={`w-8 h-8 shrink-0 rounded-md bg-white border flex items-center justify-center overflow-hidden ${
                                     isSelected ? "border-[var(--primary)]" : "border-gray-300/70"
                                 }`}>
                                     <img src={`https://api.iconify.design/${icon.split(':')[0]}/${icon.split(':')[1]}.svg`} class="w-6 h-6" alt={icon} />
