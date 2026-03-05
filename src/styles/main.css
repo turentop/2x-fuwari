@@ -45,7 +45,13 @@
     .card-interactive:active {
         @apply bg-white/10;
     }
-    h1, h2, h3, h4, h5, h6, p, a, span, li, ul, ol, blockquote, code, pre, table, th, td, strong {
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [role="button"] {
         @apply transition;
     }
     .card-shadow {
@@ -123,6 +129,10 @@
         @apply text-white/25
     }
 
+    .page-title-icon {
+        @apply h-8 w-8 rounded-lg bg-[var(--primary)] flex items-center justify-center text-black/70;
+    }
+
     .meta-icon {
         @apply w-8 h-8 transition rounded-md flex items-center justify-center bg-[var(--btn-regular-bg)]
         text-[var(--btn-content)] mr-2
@@ -159,6 +169,17 @@ body {
     width: 0;
     height: 0;
     display: none;
+}
+
+.show-scrollbar {
+    scrollbar-width: thin !important;
+    -ms-overflow-style: auto !important;
+}
+
+.show-scrollbar::-webkit-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
+    display: block !important;
 }
 
 .custom-md img, #post-cover img {
