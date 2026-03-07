@@ -7,7 +7,7 @@ on:
     types: [created]
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   issues: write
 
@@ -27,7 +27,7 @@ jobs:
       - name: Label PR by changed paths
         uses: actions/github-script@v7
         with:
-          github-token: ${{ env.PAT }}
+          github-token: ${{ github.token }}
           script: |
             const owner = context.repo.owner
             const repo = context.repo.repo
