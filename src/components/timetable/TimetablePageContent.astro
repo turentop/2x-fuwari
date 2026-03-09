@@ -2,14 +2,16 @@
 import type { TimetableViewModel } from "@/types/timetable";
 import PageCardHeader from "@components/misc/PageCardHeader.astro";
 import LiveTimetableStatus from "@components/timetable/LiveTimetableStatus.astro";
+import { Icon } from "astro-icon/components";
 import TimetableDayList from "@components/timetable/TimetableDayList.astro";
 import TimetableGrid from "@components/timetable/TimetableGrid.astro";
 
 interface Props {
 	viewModel: TimetableViewModel;
+	isCurrentWeek?: boolean;
 }
 
-const { viewModel } = Astro.props;
+const { viewModel, isCurrentWeek = false } = Astro.props;
 
 const liveStatusPayload = {
 	coursesByDay: viewModel.coursesByDay,
@@ -22,7 +24,6 @@ const liveStatusPayload = {
 	</PageCardHeader>
 
 	<div class="flex flex-wrap items-center gap-3 mb-5 text-sm">
-		<span class="text-75">当前周</span>
 		<div class="inline-flex items-center gap-1">
 			<a
 				href={`/timetable/${Math.max(1, viewModel.currentWeek - 1)}/`}
@@ -32,7 +33,7 @@ const liveStatusPayload = {
 				]}
 				aria-label="上一周"
 			>
-				&lt;
+				<Icon name="material-symbols:chevron-right-rounded" class="text-[1.25rem] rotate-180" />
 			</a>
 			<span class="min-w-[4.5rem] px-1 text-center font-medium text-90">第 {viewModel.currentWeek} 周</span>
 			<a
@@ -43,8 +44,9 @@ const liveStatusPayload = {
 				]}
 				aria-label="下一周"
 			>
-				&gt;
+				<Icon name="material-symbols:chevron-right-rounded" class="text-[1.25rem]" />
 			</a>
+			{isCurrentWeek && <span class="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-sm font-medium text-emerald-200 leading-none">当前周</span>}
 		</div>
 	</div>
 

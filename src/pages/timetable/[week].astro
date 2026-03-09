@@ -13,20 +13,22 @@ const filePath = "src/data/timetable/大一下.json";
 
 let viewModel: TimetableViewModel | null = null;
 let loadError = "";
+let isCurrentWeek = false;
 
 const weekParam = Number(Astro.params.week);
 
 try {
 	const parsedData = parseTimetableFile(filePath);
-	const fallbackWeek = resolveCurrentWeek(
+	const currentWeek = resolveCurrentWeek(
 		parsedData.meta.startDate,
 		parsedData.meta.maxWeek,
 	);
 	const selectedWeek =
 		Number.isFinite(weekParam) && weekParam >= 1
 			? Math.floor(weekParam)
-			: fallbackWeek;
+			: currentWeek;
 	viewModel = buildTimetableViewModel(parsedData, selectedWeek);
+	isCurrentWeek = viewModel.currentWeek === currentWeek;
 } catch (error) {
 	loadError = error instanceof Error ? error.message : "课表数据加载失败";
 }
@@ -64,7 +66,7 @@ export function getStaticPaths() {
 <MainGridLayout title={viewModel ? `课表 - 第${viewModel.currentWeek}周` : "课表"}>
 	<script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)}></script>
 	{viewModel ? (
-		<TimetablePageContent viewModel={viewModel} />
+		<TimetablePageContent viewModel={viewModel} isCurrentWeek={isCurrentWeek} />
 	) : (
 		<div class="card-base p-6 md:p-8">
 			<PageCardHeader title="课程表" icon="material-symbols:calendar-month" pathname="/timetable/" />
