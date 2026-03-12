@@ -267,6 +267,19 @@ mysql -uroot -p123456
 ```bash
 exit
 ```
+
+# 配置数据库
+创建webase用户
+```sql
+GRANT ALL PRIVILEGES ON *.* TO 'webase'@localhost IDENTIFIED BY '123456' WITH GRANT OPTION;
+```
+
+让webase用户可以访问所有数据库
+```sql
+GRANT ALL PRIVILEGES ON *.* TO 'webase'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+```
+
 # 配置Python3
 
 安装UV
