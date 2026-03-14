@@ -130,7 +130,7 @@ const bannerOffset =
 		<!-- <script src="/js/umami-share.js" defer></script> -->
 		<script data-swup-ignore-script src="https://p.2x.nz/random.js" defer></script>
 
-<script src="/src/scripts/animate-value.js"></script>
+<script src="/src/scripts/animate-value.js" defer></script>
 
 <script>
 		(function () {
@@ -307,7 +307,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
 <!-- Cookie Consent by TermsFeed https://www.TermsFeed.com -->
-<script data-swup-ignore-script type="text/javascript" src="https://www.termsfeed.com/public/cookie-consent/4.2.0/cookie-consent.js" charset="UTF-8"></script>
+<script data-swup-ignore-script type="text/javascript">
+(function () {
+	const load = () => {
+		if (window.__cookieConsentScriptLoaded) return;
+		window.__cookieConsentScriptLoaded = true;
+		const script = document.createElement("script");
+		script.src = "https://www.termsfeed.com/public/cookie-consent/4.2.0/cookie-consent.js";
+		script.charset = "UTF-8";
+		script.async = true;
+		document.head.appendChild(script);
+	};
+	if (document.readyState === "complete") {
+		load();
+		return;
+	}
+	window.addEventListener("load", load, { once: true });
+})();
+</script>
 <script data-swup-ignore-script type="text/javascript" charset="UTF-8">
 (function () {
 	const getPalette = () => {
@@ -395,6 +412,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		scheduleApplyPalette();
 	};
 
+	const ensureCookieConsentRun = () => {
+		const cc = window.cookieconsent;
+		if (cc && typeof cc.run === "function") {
+			runCookieConsent();
+			return;
+		}
+		setTimeout(ensureCookieConsentRun, 150);
+	};
+
 	document.addEventListener("DOMContentLoaded", () => {
 		markCookieConsentHeadAssetsPersistent();
 		new MutationObserver(markCookieConsentHeadAssetsPersistent).observe(document.head, {
@@ -402,7 +428,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			subtree: true,
 		});
 
-		runCookieConsent();
+		ensureCookieConsentRun();
 
 		new MutationObserver(scheduleApplyPalette).observe(document.documentElement, {
 			attributes: true,
@@ -534,7 +560,21 @@ var _hmt = _hmt || [];
 		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
 		<div id="page-height-extend" class="hidden h-[300vh]"></div>
 
-		<script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+		<script>
+		(function () {
+			const run = () => {
+				const script = document.createElement("script");
+				script.src = "https://cdn.dashjs.org/latest/dash.all.min.js";
+				script.async = true;
+				document.body.appendChild(script);
+			};
+			if (document.readyState === "complete") {
+				run();
+				return;
+			}
+			window.addEventListener("load", run, { once: true });
+		})();
+		</script>
 	</body>
 </html>
 
