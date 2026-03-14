@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "posts/fisco-offline.md",
+                "file": "posts/random-url-gen.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "fisco-offline"
+              "title": "random-url-gen"
             }
           },
           {
@@ -27,15 +27,16 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "posts/fisco.md",
+                "file": "posts/coxp.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "fisco"
+              "title": "coxp"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -183,8 +184,10 @@
       "bases:新建数据库": false
     }
   },
-  "active": "f6b5e7abc96521b9",
+  "active": "ee215ba144416f8f",
   "lastOpenFiles": [
+    "posts/random-url-gen.md",
+    "posts/coxp.md",
     "posts/fisco.md",
     "posts/fisco-offline.md",
     "assets/images/fisco-offline-2.png",
@@ -224,7 +227,6 @@
     "posts/auto-pr-link.md",
     "posts/avatar.md",
     "posts/alist-for-aliyun.md",
-    "posts/gal.md",
     "posts copy",
     "posts/posts.zip",
     "posts/watermark.zip",

@@ -19,16 +19,85 @@ lang: ""
 能实现吗？
 
 当然可以！这是你的流程图！
-![](../assets/images/random-url-gen-5.webp)
+
+```mermaid
+flowchart TD
+    A[客户端请求<br/>GET /random]
+    B[Web 服务器接收请求]
+    C[从图片目录读取图片列表]
+    D[随机选择一张图片]
+    E[读取图片文件内容]
+    F[构造 HTTP 响应<br/>Content-Type: image/*]
+    G[返回图片给客户端]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+```
+
 但也会带来一些问题，比如，图片存在本地，给客户端响应图片的时候走的是你机子的流量，那么你就需要一个 **高带宽** 的服务器，这无疑是一个 **高昂** 的成本
 
 那可能你会有新的方案： **前后端分离** （逻辑与资产分离），只将返回这个图片的逻辑存放在服务器上，而图片存到其他地方，如对象存储（Cloudflare R2）、IPFS等等
-![](../assets/images/random-url-gen-6.webp)
+
+```mermaid
+flowchart TD
+    A[客户端请求<br/>GET /random]
+    B[随机图逻辑服务器]
+    C[读取图片索引 / 元数据]
+    D[随机选择一张图片]
+    E[生成图片访问地址<br/>R2 / IPFS / 对象存储]
+    F[返回 302 重定向<br/>Location: 图片URL]
+    G[客户端请求图片资源]
+    H[对象存储 / IPFS / CDN]
+    I[返回图片数据给客户端]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+```
+
 那么问题又来了，假如说你的项目太多人用了，那你的服务器性能可能不够，在后期，你仍然需要一个 **高昂** 的 **维护成本** 
 
 那么那么那么，现在是 **2025** 年，传统的架构已经无法满足我们了，我们不妨可以试试 **云函数** 
 仍然是前后端分离，我们现在将逻辑放到一个函数上面，如Cloudflare Worker、EdgeOne Function、Vercel Function等等
-![](../assets/images/random-url-gen-8.webp)
+
+```mermaid
+flowchart LR
+
+    Client[客户端]
+
+    subgraph Logic[逻辑层（云函数 / API）]
+        A[接收 /random 请求]
+        B[读取图片索引]
+        C[随机选择图片]
+        D[生成访问地址]
+        E[返回 302 重定向]
+    end
+
+    subgraph Assets[资产层（静态资源）]
+        F[CDN / IPFS Gateway]
+        G[对象存储<br/>R2 / S3 / COS]
+    end
+
+    Client --> A
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> Client
+
+    Client --> F
+    F --> G
+```
+
 那么现在是不是无敌了？
 
 并非，虽然前端因为使用了 **云函数** 也就是直接接入了CDN，高并发已经不是问题了，但是由于资产并不直接托管在 **云函数** 中，**云函数** 仍然需要创建一个长连接从你的后端，如对象存储获取图片，这样一折腾，你的服务可能并不算快
@@ -41,7 +110,35 @@ lang: ""
 
 那么接下来，你就得到了一个完全不需要你买服务器托管，也不需要你担心存储爆仓导致天价账单的随机图...了吗？
 
-![](../assets/images/random-url-gen-4.webp)
+```mermaid
+flowchart TB
+
+    C1[客户端1]
+    C2[客户端2]
+    C3[客户端3]
+
+    A1[请求API]
+    A2[请求API]
+    A3[请求API]
+
+    F1[云函数节点1]
+    F2[云函数节点2]
+    F3[云函数节点3]
+
+    R1{抽选一张图片}
+    R2{抽选一张图片}
+    R3{抽选一张图片}
+
+    S[云函数静态资产]
+
+    C1 --> A1 --> F1 --> R1
+    C2 --> A2 --> F2 --> R2
+    C3 --> A3 --> F3 --> R3
+
+    R1 --> S
+    R2 --> S
+    R3 --> S
+```
 # 探索随机图（随机URL）的本质
 我们刚刚只是在抽象的说明某种架构 **好像** 可行，**好像** 又有什么问题，然后又有一种什么新思路 **好像** 可以解决这个问题
 
@@ -86,7 +183,39 @@ lang: ""
 那如果说我图比这多呢？加一位，16^5 = 1048576，够用了吧
 那如果说我图比这少呢？那我们可以让图片填充，说个极端的例子，假如你只有2张图，每张图创建32768个副本即可，依此类推
 
-![](../assets/images/random-url-gen-10.webp)
+```mermaid
+flowchart TD
+
+A[客户端请求<br/>GET /h]
+B[Cloudflare 边缘节点]
+C{Transform Rules<br/>是否匹配?}
+
+D[Rewrite URL<br/>动态重写 Path]
+E[按原路径处理]
+
+F[生成随机字符串<br/>uuidv4 + random_seed]
+G[取前三位十六进制字符<br/>substring 0~3]
+H[拼接新路径<br/>/h/abc.jpg]
+
+I[Cloudflare Pages 静态站点]
+J[命中 dist/h/abc.jpg]
+K[直接返回图片资源]
+L[客户端接收随机图片]
+
+A --> B
+B --> C
+
+C -- 是 --> D
+C -- 否 --> E
+
+D --> F
+F --> G
+G --> H
+H --> I
+I --> J
+J --> K
+K --> L
+```
 
 ::github{repo="afoim/cf-rule-random-url"}
 
@@ -102,7 +231,23 @@ lang: ""
 
 大致原理为编写一个客户端JS，生成一个随机数，然后拼接URL得到最终的随机图，然后寻找需要替换为随机图的img容器或者背景图容器，替换其中内容
 
-![](../assets/images/random-url-gen-11.webp)
+```mermaid
+flowchart LR
+  subgraph build["构建期"]
+    direction LR
+    src["原始图片"] --> buildjs["build.js"]
+    buildjs --> static["静态图片库"]
+    buildjs --> randomjs["random.js"]
+  end
+
+  subgraph runtime["运行期（浏览器）"]
+    direction LR
+    exec["random.js 执行"] --> pick["随机选图"] --> dom["DOM 注入"]
+  end
+
+  randomjs --> exec
+
+```
 
 ::github{repo="afoim/Static_RandomPicAPI"}
 

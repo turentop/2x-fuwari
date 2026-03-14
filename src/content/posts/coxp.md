@@ -173,4 +173,112 @@ COEP 并不会阻止浏览器发起网络请求，但会在资源返回后决定
 
 # 浏览器安全模型完整流程图
 
-![](../assets/images/coxp.svg)
+```mermaid
+flowchart TD
+    Start([浏览器发起请求]) --> CheckSameOrigin{是否同源?/协议+域名+端口都相同?}
+    
+    CheckSameOrigin -->|是| SameOriginSuccess[同源请求/直接发送]:::success
+    SameOriginSuccess --> End1([请求成功]):::success
+    
+    CheckSameOrigin -->|否| CrossOrigin[跨域请求]
+    
+    CrossOrigin --> CheckRequestType{请求类型判断}
+    
+    CheckRequestType --> SimpleCheck{是否为简单请求?/方法: GET/HEAD/POST/头部仅限安全字段/Content-Type仅限三种}
+    
+    SimpleCheck -->|是| SimpleRequest[简单请求/直接发送实际请求]
+    SimpleCheck -->|否| PreflightRequest[非简单请求/需要预检]
+    
+    PreflightRequest --> SendPreflight[发送OPTIONS预检请求/包含Origin等头部]
+    
+    SendPreflight --> ServerPreflight{服务器响应预检}
+    
+    ServerPreflight -->|无CORS头或不匹配| PreflightFail[预检失败/请求被阻止]:::failure
+    PreflightFail --> End2([请求失败]):::failure
+    
+    ServerPreflight -->|有效CORS头| CheckPreflightHeaders{检查预检响应头/Allow-Origin/Methods/Headers}
+    
+    CheckPreflightHeaders -->|不匹配| PreflightFail
+    CheckPreflightHeaders -->|匹配| PreflightPass[预检通过]:::success
+    
+    PreflightPass --> SendActualRequest[发送实际请求]
+    SimpleRequest --> SendActualRequest
+    
+    SendActualRequest --> ServerResponse[服务器处理并返回响应]
+    
+    ServerResponse --> CheckCORS{检查CORS响应头}
+    
+    CheckCORS --> CheckOriginHeader{Access-Control-Allow-Origin/是否存在且匹配?}
+    
+    CheckOriginHeader -->|否| CORSFail[CORS验证失败/响应被阻止]:::failure
+    CORSFail --> End3([请求失败]):::failure
+    
+    CheckOriginHeader -->|是| CheckCredentials{请求是否携带凭证?/cookies或HTTP认证}
+    
+    CheckCredentials -->|否| CORSPass[CORS验证通过]:::success
+    
+    CheckCredentials -->|是| CheckAllowCredentials{Allow-Credentials/是否为true?}
+    
+    CheckAllowCredentials -->|否| CredentialsFail[凭证验证失败/响应被阻止]:::failure
+    CredentialsFail --> End4([请求失败]):::failure
+    
+    CheckAllowCredentials -->|是| CheckWildcard{Allow-Origin/是否为通配符*?}
+    
+    CheckWildcard -->|是| WildcardFail[通配符冲突/不能与凭证同时使用]:::failure
+    WildcardFail --> End5([请求失败]):::failure
+    
+    CheckWildcard -->|否-具体源| CORSPass
+    
+    CORSPass --> CheckResourceType{资源类型判断}
+    
+    CheckResourceType --> CheckCORP{是否需要检查CORP?/跨域嵌入资源}
+    
+    CheckCORP -->|不需要| ResponseSuccess[响应可用]:::success
+    
+    CheckCORP -->|需要| CheckCORPHeader{Cross-Origin-Resource-Policy/响应头检查}
+    
+    CheckCORPHeader -->|未设置| CheckCOEP{嵌入页面是否设置/COEP: require-corp?}
+    
+    CheckCOEP -->|否| ResponseSuccess
+    CheckCOEP -->|是| CORPFail[CORP策略阻止/资源被阻止]:::failure
+    CORPFail --> End6([请求失败]):::failure
+    
+    CheckCORPHeader -->|same-origin| CheckCORPSameOrigin{是否同源?}
+    CheckCORPSameOrigin -->|是| ResponseSuccess
+    CheckCORPSameOrigin -->|否| CORPFail
+    
+    CheckCORPHeader -->|same-site| CheckCORPSameSite{是否同站?/相同eTLD+1}
+    CheckCORPSameSite -->|是| ResponseSuccess
+    CheckCORPSameSite -->|否| CORPFail
+    
+    CheckCORPHeader -->|cross-origin| CheckCrossOriginAttrs{检查资源标签属性/crossorigin属性}
+    
+    CheckCrossOriginAttrs -->|未设置| CORPFail
+    CheckCrossOriginAttrs -->|已设置| ResponseSuccess
+    
+    ResponseSuccess --> CheckCOOP{检查COOP策略/Cross-Origin-Opener-Policy}
+    
+    CheckCOOP --> CheckCOOPValue{COOP值检查}
+    
+    CheckCOOPValue -->|unsafe-none默认| AllowOpener[允许opener访问]:::success
+    
+    CheckCOOPValue -->|same-origin| CheckCOOPSameOrigin{打开者与被打开页面/是否同源?}
+    CheckCOOPSameOrigin -->|是| AllowOpener
+    CheckCOOPSameOrigin -->|否| BlockOpener[隔离浏览上下文/opener=null]:::warning
+    
+    CheckCOOPValue -->|same-origin-allow-popups| CheckPopup{是否为弹窗?}
+    CheckPopup -->|是| AllowOpener
+    CheckPopup -->|否| BlockOpener
+    
+    AllowOpener --> FinalSuccess([请求完全成功/数据可用]):::success
+    BlockOpener --> FinalPartial([请求成功但受限/部分功能隔离]):::warning
+    
+    classDef success fill:#90EE90,stroke:#006400,stroke-width:3px,color:#000
+    classDef failure fill:#FFB6C6,stroke:#8B0000,stroke-width:3px,color:#000
+    classDef warning fill:#FFE4B5,stroke:#FF8C00,stroke-width:2px,color:#000
+```
+
+
+
+
+
