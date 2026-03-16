@@ -83,4 +83,3 @@ export function serializeTimetableDataToFileText(
 	];
 	return `${segments.map((segment) => JSON.stringify(segment)).join("\n")}\n`;
 }
-
