@@ -1,6 +1,5 @@
 <script lang="ts">
 import Icon from "@iconify/svelte";
-import { onMount } from "svelte";
 
 export let apiBase = "https://e3.2x.nz/api/";
 
@@ -14,9 +13,12 @@ interface FileItem {
 }
 
 let items: FileItem[] = [];
-let pathStack: { name: string; path: string; items: FileItem[] }[] = [];
+let pathStack: { name: string; path: string; items: FileItem[] }[] = [
+	{ name: "OneDrive 根目录", path: "/", items: [] },
+];
 let loading = false;
 let error = "";
+let initialized = false;
 
 async function fetchItems(currentPath = "/") {
 	loading = true;
@@ -31,7 +33,7 @@ async function fetchItems(currentPath = "/") {
 		}
 
 		const data = await response.json();
-		const folderValue = data.folder?.value || [];
+		const folderValue = data.folder?.value || data.value || [];
 
 		items = folderValue
 			.map((item: any) => {
@@ -57,11 +59,7 @@ async function fetchItems(currentPath = "/") {
 				return a.type === "directory" ? -1 : 1;
 			});
 
-		if (pathStack.length === 0) {
-			pathStack = [{ name: "OneDrive 根目录", path: "/", items }];
-		} else {
-			pathStack[pathStack.length - 1].items = items;
-		}
+		pathStack[pathStack.length - 1].items = items;
 	} catch (err: any) {
 		error = `加载失败: ${err.message}`;
 		console.error(err);
@@ -159,11 +157,12 @@ function getFileIcon(filename: string) {
 	}
 }
 
-onMount(() => {
+$: if (!initialized && typeof window !== "undefined") {
+	initialized = true;
 	fetchItems("/");
-});
+}
 
-$: currentView = pathStack[pathStack.length - 1] || { items: [] };
+$: currentView = pathStack[pathStack.length - 1] || { path: "/", items: [] };
 </script>
 
 <div class="onedrive-explorer-container">

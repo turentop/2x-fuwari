@@ -330,7 +330,6 @@ export default defineConfig({
 					),
 				},
 			],
-			conditions: ["svelte"],
 		},
 		server: {
 		allowedHosts: ['2x.nz']
