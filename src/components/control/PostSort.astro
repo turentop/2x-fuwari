@@ -57,15 +57,6 @@ const getSortUrl = (type: string, descending: boolean) => {
         const container = document.querySelector('.post-sort-container');
         if (!container) return;
 
-        // Hide sort controls on non-home pages
-        const isHomePage = path === '/' || path === '' ||
-            path.match(/^\/(date-asc|date-desc|alpha-asc|alpha-desc)\/?$/);
-        if (!isHomePage) {
-            container.style.display = 'none';
-            return;
-        }
-        container.style.display = '';
-
         // Parse current state from URL
         let type = 'date';
         let desc = true;
@@ -129,7 +120,6 @@ const getSortUrl = (type: string, descending: boolean) => {
         orderBtn.setAttribute('href', getUrl(type, !desc));
     }
 
-    // Run on Swup page view and initial load
+    // Run on Swup page view
     document.addEventListener('swup:page:view', updateSortControls);
-    document.addEventListener('DOMContentLoaded', updateSortControls);
 </script>
