@@ -1,8 +1,8 @@
 <script lang="ts">
+import fa6Solid from "@iconify-json/fa6-solid/icons.json";
+import materialSymbols from "@iconify-json/material-symbols/icons.json";
 import Icon from "@iconify/svelte";
 import { addCollection } from "@iconify/svelte";
-import materialSymbols from "@iconify-json/material-symbols/icons.json";
-import fa6Solid from "@iconify-json/fa6-solid/icons.json";
 import { url } from "@utils/url-utils.ts";
 import { onMount } from "svelte";
 import Highlight from "./Highlight.svelte";
@@ -405,7 +405,7 @@ top-20 left-4 md:left-[unset] right-4 shadow-none rounded-2xl p-2">
     outline: 0;
   }
   .search-panel {
-    background-color: var(--float-panel-bg-opaque);
+    background-color: var(--float-panel-bg);
     max-height: calc(100vh - 100px);
     overflow-y: auto;
     scrollbar-width: none; /* Firefox */

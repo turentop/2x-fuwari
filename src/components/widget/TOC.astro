@@ -64,10 +64,14 @@ function buildToc(headings: MarkdownHeading[]): TocItem[] {
 const toc = buildToc(headings);
 ---
 {isPostsRoute &&
-<table-of-contents class:list={[className, "group block relative z-0 bg-[var(--float-panel-bg-opaque)] rounded-xl p-2"]}>
-    <TOCList items={toc} />
-    <div id="active-indicator" class:list={[{'hidden': headings.length == 0}, "-z-10 absolute bg-[var(--toc-btn-hover)] left-2 right-2 rounded-xl transition-all " +
-        "group-hover:bg-transparent border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed"]}></div>
+<table-of-contents class:list={[className, "toc-panel group block relative z-0 h-full rounded-xl"]}>
+    <div id="toc-scroll-region" class="toc-scroll-region absolute inset-0 overflow-y-auto overflow-x-hidden">
+        <div class="relative min-h-full p-2">
+            <TOCList items={toc} />
+            <div id="active-indicator" class:list={[{'hidden': headings.length == 0}, "-z-10 absolute bg-[var(--toc-btn-hover)] left-2 right-2 rounded-xl transition-all " +
+                "group-hover:bg-transparent border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed"]}></div>
+        </div>
+    </div>
 </table-of-contents>}
 
 <script>
@@ -224,7 +228,7 @@ class TableOfContents extends HTMLElement {
 
     init() {
         this.tocEl = document.getElementById(
-            "toc-inner-wrapper"
+            "toc-scroll-region"
         );
 
         if (!this.tocEl) return;

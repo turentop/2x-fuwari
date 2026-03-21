@@ -44,39 +44,18 @@ export function getBgBlur(): number {
 
 export function setBgBlur(blur: number): void {
 	localStorage.setItem("bg-blur", String(blur));
-	const bgBox = document.getElementById("bg-box");
-	if (bgBox) {
-		// Retrieve existing hue-rotate value if any, or 0
-		const currentFilter = bgBox.style.filter || "";
-		const hueRotateMatch = currentFilter.match(/hue-rotate\((.*?)deg\)/);
-		const hueRotate = hueRotateMatch ? hueRotateMatch[1] : "0";
-		bgBox.style.setProperty(
-			"filter",
-			`blur(${blur / 16}rem) hue-rotate(${hueRotate}deg)`,
-		);
-	}
+	document.documentElement.style.setProperty("--bg-blur", `${blur / 16}rem`);
 }
 
 export function setBgHueRotate(hue: number): void {
-	const bgBox = document.getElementById("bg-box");
-	if (bgBox) {
-		// Retrieve existing blur value
-		const blur = getBgBlur();
-		bgBox.style.setProperty(
-			"filter",
-			`blur(${blur / 16}rem) hue-rotate(${hue}deg)`,
-		);
-	}
+	document.documentElement.style.setProperty("--bg-hue-rotate", `${hue}deg`);
 }
 
 export function getBgHueRotate(): number {
-	const bgBox = document.getElementById("bg-box");
-	if (bgBox) {
-		const currentFilter = bgBox.style.filter || "";
-		const hueRotateMatch = currentFilter.match(/hue-rotate\((.*?)deg\)/);
-		return hueRotateMatch ? Number.parseInt(hueRotateMatch[1]) : 0;
-	}
-	return 0;
+	const current = getComputedStyle(document.documentElement)
+		.getPropertyValue("--bg-hue-rotate")
+		.trim();
+	return current ? Number.parseInt(current) : 0;
 }
 
 export function getHideBg(): boolean {
@@ -86,10 +65,7 @@ export function getHideBg(): boolean {
 
 export function setHideBg(hide: boolean): void {
 	localStorage.setItem("hide-bg", String(hide));
-	const bgBox = document.getElementById("bg-box");
-	if (bgBox) {
-		bgBox.style.setProperty("opacity", hide ? "0" : "");
-	}
+	document.documentElement.style.setProperty("--bg-enable", hide ? "0" : "1");
 }
 
 export function getDevMode(): boolean {

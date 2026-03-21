@@ -113,8 +113,8 @@ function init() {
 	loadGiscus();
 
 	new MutationObserver(() => {
-		const frame = document.querySelector("iframe.giscus-frame");
-		if (!frame) return;
+		const frame = document.querySelector<HTMLIFrameElement>("iframe.giscus-frame");
+		if (!frame?.contentWindow) return;
 		frame.contentWindow.postMessage(
 			{ giscus: { setConfig: { theme: "dark" } } },
 			"https://giscus.app",
@@ -167,14 +167,10 @@ const setup = () => {
 		"visit:start",
 		(visit: { to: { url: string }; containers?: string[] }) => {
 			const bodyElement = document.querySelector("body");
-			if (pathsEqual(visit.to.url, url("/"))) {
-				bodyElement!.classList.add("lg:is-home");
-			} else {
-				bodyElement!.classList.remove("lg:is-home");
-			}
+			const targetIsHome = pathsEqual(visit.to.url, url("/"));
 
 			const heightExtend = document.getElementById("page-height-extend");
-			if (heightExtend) {
+			if (heightExtend && !targetIsHome) {
 				heightExtend.classList.remove("hidden");
 			}
 
@@ -201,21 +197,25 @@ const setup = () => {
 			}
 		},
 	);
-	window.swup.hooks.on("page:view", () => {
+	window.swup.hooks.on("page:view", (visit: { to?: { url: string } }) => {
+		const bodyElement = document.querySelector("body");
+		const targetUrl = visit?.to?.url ?? window.location.href;
+		if (pathsEqual(targetUrl, url("/"))) {
+			bodyElement?.classList.add("lg:is-home");
+		} else {
+			bodyElement?.classList.remove("lg:is-home");
+		}
+
 		const heightExtend = document.getElementById("page-height-extend");
 		if (heightExtend) {
-			heightExtend.classList.remove("hidden");
+			heightExtend.classList.add("hidden");
 		}
+
 		scrollFunction();
 		loadGiscus();
 	});
-	window.swup.hooks.on("visit:end", (_visit: { to: { url: string } }) => {
-		setTimeout(() => {
-			const heightExtend = document.getElementById("page-height-extend");
-			if (heightExtend) {
-				heightExtend.classList.add("hidden");
-			}
-
+	window.swup.hooks.on("visit:end", () => {
+		requestAnimationFrame(() => {
 			const toc = document.getElementById("toc-wrapper");
 			if (toc) {
 				toc.classList.remove("toc-not-ready");
@@ -226,7 +226,9 @@ const setup = () => {
 			if (sortContainer) {
 				sortContainer.classList.remove("sort-keep");
 			}
-		}, 200);
+
+			scrollFunction();
+		});
 	});
 };
 if (window?.swup?.hooks) {

@@ -41,9 +41,9 @@ const currentColor = colorMap[level] || colorMap.info;
 ---
 
 {enable && (
-    <div class="notice-card mb-4 relative transition-all duration-300 hover:shadow-lg onload-animation">
+    <div class="notice-card mb-4 relative transition-all duration-300 hover:shadow-lg">
         <div
-			class="notice-content flex items-start p-4 rounded-xl bg-[var(--card-bg)] border transition-colors"
+			class="notice-content flex items-start p-4 rounded-xl bg-[var(--card-bg)] border transition-colors onload-animation"
 			class:list={[{ "notice-happy": isHappy }]}
 			style={isHappy ? {} : { borderColor: currentColor, color: currentColor }}
 		>

@@ -13,7 +13,6 @@ import { profileConfig, siteConfig } from "@/config";
 import ConfigCarrier from "@components/ConfigCarrier.astro";
 import BodyThirdPartyScripts from "@components/layout/BodyThirdPartyScripts.astro";
 import DashLoaderScript from "@components/layout/DashLoaderScript.astro";
-import LiquidGlassFilter from "@components/layout/LiquidGlassFilter.astro";
 import NewPostNotification from "@components/widget/NewPostNotification.astro";
 import {
 	BANNER_HEIGHT,
@@ -90,7 +89,7 @@ const bannerOffset =
 ---
 
 <!DOCTYPE html>
-    <html lang={siteLang} class="bg-[var(--page-bg)] transition text-[12px] md:text-[16px] dark">
+    <html lang={siteLang} class="transition text-[12px] md:text-[16px] dark">
 
 	<head>
 
@@ -132,7 +131,6 @@ const bannerOffset =
         <link rel="preconnect" href="https://support.nodeget.com" />
 		
 		<!-- <script src="/js/umami-share.js" defer></script> -->
-		<script data-swup-ignore-script src="https://p.2x.nz/random.js" defer></script>
 
 <script src="../scripts/animate-value.js"></script>
 
@@ -194,57 +192,73 @@ const bannerOffset =
 		<style define:vars={{
 			configHue,
 			'page-width': `${PAGE_WIDTH}rem`,
-			'bg-src': siteConfig.background.src || '',
-			'bg-enable': siteConfig.background.enable ? '1' : '0',
-			'bg-position': siteConfig.background.position || 'center',
-			'bg-size': siteConfig.background.size || 'cover',
-			'bg-repeat': siteConfig.background.repeat || 'no-repeat',
-			'bg-attachment': siteConfig.background.attachment || 'fixed',
-			'bg-opacity': (siteConfig.background.opacity || 0.3).toString()
+			'bg-image-initial': siteConfig.background.src
+				? `url("${siteConfig.background.src}")`
+				: 'none',
+			'bg-enable-initial': siteConfig.background.enable ? '1' : '0',
+			'bg-position-initial': siteConfig.background.position || 'center',
+			'bg-size-initial': siteConfig.background.size || 'cover',
+			'bg-repeat-initial': siteConfig.background.repeat || 'no-repeat',
+			'bg-attachment-initial': siteConfig.background.attachment || 'fixed',
+			'bg-opacity-initial': (siteConfig.background.opacity || 0.3).toString()
 		}}>
 			:root {
-				--bg-src: var(--bg-src);
-				--bg-enable: var(--bg-enable);
-				--bg-position: var(--bg-position);
-				--bg-size: var(--bg-size);
-				--bg-repeat: var(--bg-repeat);
-				--bg-attachment: var(--bg-attachment);
-				--bg-opacity: var(--bg-opacity);
-			}
-			
-			/* Background image configuration */
-			body {
-				--bg-src: var(--bg-src);
-				--bg-enable: var(--bg-enable);
-				--bg-position: var(--bg-position);
-				--bg-size: var(--bg-size);
-				--bg-repeat: var(--bg-repeat);
-				--bg-attachment: var(--bg-attachment);
-				--bg-opacity: var(--bg-opacity);
+				--bg-image: var(--bg-image-initial);
+				--bg-enable: var(--bg-enable-initial);
+				--bg-position: var(--bg-position-initial);
+				--bg-size: var(--bg-size-initial);
+				--bg-repeat: var(--bg-repeat-initial);
+				--bg-attachment: var(--bg-attachment-initial);
+				--bg-opacity: var(--bg-opacity-initial);
+				--bg-blur: 0.25rem;
+				--bg-hue-rotate: 0deg;
 			}
 
-			#bg-box {
+			html {
+				background: var(--page-bg);
+			}
+
+			body {
+				position: relative;
+				isolation: isolate;
+				background-color: transparent;
+			}
+
+			#site-bg-layer {
 				position: fixed;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
+				inset: 0;
+				pointer-events: none;
+				z-index: 0;
+				overflow: hidden;
+				background: var(--page-bg);
+			}
+
+			.site-bg-pane {
+				position: absolute;
+				inset: 0;
 				background-image: none;
 				background-position: var(--bg-position);
 				background-size: var(--bg-size);
 				background-repeat: var(--bg-repeat);
 				background-attachment: var(--bg-attachment);
-				opacity: 0;
-				pointer-events: none;
-				z-index: -1;
-				transition: opacity 0.3s ease-in-out;
-                /* Prevent background jump on mobile browsers with dynamic URL bars */
-                will-change: transform;
-                transform: translateZ(0);
+				filter: blur(var(--bg-blur)) hue-rotate(var(--bg-hue-rotate));
+				transform: scale(1.05);
+				transform-origin: center;
+				transition: opacity 0.45s ease;
 			}
-			
-			#bg-box.loaded {
-				opacity: calc(var(--bg-opacity) * var(--bg-enable));
+
+			#site-bg-pane-a {
+				opacity: calc(var(--bg-enable) * var(--bg-opacity) * var(--site-bg-pane-a-alpha, 0));
+			}
+
+			#site-bg-pane-b {
+				opacity: calc(var(--bg-enable) * var(--bg-opacity) * var(--site-bg-pane-b-alpha, 0));
+			}
+
+			#site-content {
+				position: relative;
+				z-index: 1;
+				min-height: 100vh;
 			}
 		</style>
 
@@ -261,28 +275,95 @@ const bannerOffset =
 
 	</head>
 	<body class=" min-h-screen transition " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}>
+		<div id="site-bg-layer" aria-hidden="true">
+			<div id="site-bg-pane-a" class="site-bg-pane"></div>
+			<div id="site-bg-pane-b" class="site-bg-pane"></div>
+		</div>
+		<div id="site-content">
+			<BodyThirdPartyScripts />
 
+			<ConfigCarrier></ConfigCarrier>
+			<NewPostNotification></NewPostNotification>
+			<slot />
 
+			<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
+			<div id="page-height-extend" class="hidden h-[300vh]"></div>
 
-<BodyThirdPartyScripts />
+			<DashLoaderScript />
+		</div>
+		<script is:inline>
+			(() => {
+				const layer = document.getElementById("site-bg-layer");
+				const paneA = document.getElementById("site-bg-pane-a");
+				const paneB = document.getElementById("site-bg-pane-b");
+				if (!(layer instanceof HTMLElement) || !(paneA instanceof HTMLElement) || !(paneB instanceof HTMLElement)) return;
 
+				let activePane = paneA;
+				let currentBgImage = "";
 
-		<noscript>
-			<style>
-				#bg-box {
-					opacity: 1 !important;
-				}
-			</style>
-		</noscript>
-		<div id="bg-box"></div>
-		<ConfigCarrier></ConfigCarrier>
-        <NewPostNotification></NewPostNotification>
-		<slot />
+				const setPaneAlpha = (pane, alpha) => {
+					pane.style.setProperty(pane === paneA ? "--site-bg-pane-a-alpha" : "--site-bg-pane-b-alpha", String(alpha));
+				};
 
-		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
-		<div id="page-height-extend" class="hidden h-[300vh]"></div>
+				const applyPaneAlpha = (visiblePane) => {
+					document.documentElement.style.setProperty("--site-bg-pane-a-alpha", visiblePane === paneA ? "1" : "0");
+					document.documentElement.style.setProperty("--site-bg-pane-b-alpha", visiblePane === paneB ? "1" : "0");
+				};
 
-		<DashLoaderScript />
+				const waitForImage = (src) => new Promise((resolve) => {
+					const img = new Image();
+					img.decoding = "async";
+					img.onload = () => resolve(true);
+					img.onerror = () => resolve(false);
+					img.src = src;
+					if (typeof img.decode === "function") {
+						img.decode().then(() => resolve(true)).catch(() => undefined);
+					}
+				});
+
+				const extractUrl = (bgImage) => {
+					const match = String(bgImage).match(/^url\(["']?(.*?)["']?\)$/);
+					return match?.[1] || "";
+				};
+
+				const swapBackground = async () => {
+					const bgImage = getComputedStyle(document.documentElement).getPropertyValue("--bg-image").trim() || "none";
+					if (bgImage === currentBgImage) return;
+					currentBgImage = bgImage;
+
+					const nextPane = activePane === paneA ? paneB : paneA;
+					if (bgImage === "none") {
+						nextPane.style.backgroundImage = "none";
+						activePane = nextPane;
+						applyPaneAlpha(activePane);
+						return;
+					}
+
+					const src = extractUrl(bgImage);
+					if (src) {
+						const loaded = await waitForImage(src);
+						if (!loaded || currentBgImage !== bgImage) return;
+					}
+
+					nextPane.style.backgroundImage = bgImage;
+					requestAnimationFrame(() => {
+						activePane = nextPane;
+						applyPaneAlpha(activePane);
+					});
+				};
+
+				applyPaneAlpha(activePane);
+				swapBackground();
+
+				const observer = new MutationObserver(() => {
+					swapBackground();
+				});
+				observer.observe(document.documentElement, {
+					attributes: true,
+					attributeFilter: ["style"],
+				});
+			})();
+		</script>
 	</body>
 </html>
 
@@ -325,4 +406,3 @@ const bannerOffset =
 
 <script src="../scripts/layout-fancybox-runtime.ts"></script>
 
-<LiquidGlassFilter />

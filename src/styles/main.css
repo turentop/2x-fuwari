@@ -28,6 +28,8 @@
     .card-base {
         @apply rounded-[var(--radius-large)] overflow-hidden bg-[var(--card-bg)] transition;
         @apply border border-white/10;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
     }
     .card-hover {
         @apply hover:scale-[1.01] hover:shadow-xl hover:border-white/20 hover:z-10;
@@ -69,6 +71,18 @@
     }
     .float-panel {
         @apply top-[5.25rem] rounded-[var(--radius-large)] overflow-hidden bg-[var(--float-panel-bg)] transition shadow-none;
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+    }
+    .toc-panel {
+        @apply rounded-[var(--radius-large)] overflow-hidden bg-[var(--card-bg)] border border-white/10 transition shadow-none;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+    .toc-scroll-region {
+        scroll-padding-block: 2.5rem;
+        mask-image: linear-gradient(to bottom, transparent 0%, black 1.5rem, black calc(100% - 1.5rem), transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 1.5rem, black calc(100% - 1.5rem), transparent 100%);
     }
     .float-panel-closed {
         @apply -translate-y-1 opacity-0 pointer-events-none
@@ -110,7 +124,6 @@
     }
 
     #toc-inner-wrapper {
-        mask-image: linear-gradient(to bottom, transparent 0%, black 2rem, black calc(100% - 2rem), transparent 100%);
     }
 
     .text-90 {
@@ -158,7 +171,11 @@ html {
 
 body {
     overflow: visible;
+    position: relative;
+    background-color: var(--page-bg);
+    min-height: 100vh;
 }
+
 
 *:not(html):not(body) {
     scrollbar-width: none;

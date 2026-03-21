@@ -80,24 +80,24 @@ const mainPanelTop = siteConfig.banner.enable
             </a>}
 
 
-            <SideBar class="mb-4 row-start-2 col-span-1 lg:row-start-1 lg:col-span-1 md:row-start-1 md:col-span-1 lg:max-w-[17.5rem] md:max-w-[17.5rem] onload-animation" headings={headings}></SideBar>
+            <SideBar class="mb-4 row-start-2 col-span-1 lg:row-start-1 lg:col-span-1 md:row-start-1 md:col-span-1 lg:max-w-[17.5rem] md:max-w-[17.5rem]" headings={headings}></SideBar>
 
             <main id="swup-main" class="row-start-1 col-span-1 lg:row-start-1 lg:col-span-1 md:row-start-1 md:col-span-1 overflow-visible min-w-0">
-                <div id="content-wrapper" class="onload-animation">
+                <div id="content-wrapper">
                     <!-- the overflow-hidden here prevent long text break the layout-->
                     <!-- make id different from windows.swup global property -->
                     <Announcement></Announcement>
 
-                    <div id="sort-container" class="transition-swup-fade">
+                    <div id="sort-container">
                         <slot name="before-content" />
                     </div>
-                    <div id="swup-container" class="transition-swup-fade">
+                    <div id="swup-container" class="transition-swup-presence">
                         <slot></slot>
                     </div>
                 </div>
             </main>
 
-            <div class="footer col-span-1 row-start-3 lg:col-span-1 lg:col-start-2 lg:row-start-2 md:col-span-1 md:col-start-2 md:row-start-2 onload-animation">
+            <div class="footer col-span-1 row-start-3 lg:col-span-1 lg:col-start-2 lg:row-start-2 md:col-span-1 md:col-start-2 md:row-start-2">
                 <Footer></Footer>
             </div>
         </div>
@@ -113,11 +113,11 @@ const mainPanelTop = siteConfig.banner.enable
         {siteConfig.toc.enable && <div id="toc-wrapper" class:list={["transition absolute top-0 -right-[var(--toc-width)] w-[var(--toc-width)] flex items-center",
             {"toc-hide": siteConfig.banner.enable}]}
         >
-            <div id="toc-inner-wrapper" class="fixed top-14 w-[var(--toc-width)] h-[calc(100vh_-_20rem)] overflow-y-scroll overflow-x-hidden">
-                <div id="toc" class="w-full h-full transition-swup-fade ">
-                    <div class="h-8 w-full"></div>
-                    <TOC headings={headings}></TOC>
-                    <div class="h-8 w-full"></div>
+            <div id="toc-inner-wrapper" class="fixed top-14 bottom-[19rem] w-[var(--toc-width)] overflow-hidden">
+                <div id="toc" class="w-full h-full flex flex-col items-stretch justify-start px-2">
+                    <div class="h-8 w-full shrink-0"></div>
+                    <TOC headings={headings} class="h-full"></TOC>
+                    <div class="h-8 w-full shrink-0"></div>
                 </div>
             </div>
         </div>}
@@ -128,6 +128,43 @@ const mainPanelTop = siteConfig.banner.enable
 </div>
 
 <script is:inline>
+    (() => {
+    const ONLOAD_ANIMATION_CONTAINERS = ['#sort-container', '#swup-container', '#toc'];
+
+    function cleanupOnloadAnimations(root = document, immediate = false) {
+        const elements = root.querySelectorAll('.onload-animation');
+
+        elements.forEach((element) => {
+            const cleanup = () => {
+                element.classList.remove('onload-animation');
+                element.removeEventListener('animationend', cleanup);
+                element.removeEventListener('animationcancel', cleanup);
+            };
+
+            if (immediate) {
+                cleanup();
+                return;
+            }
+
+            element.addEventListener('animationend', cleanup, { once: true });
+            element.addEventListener('animationcancel', cleanup, { once: true });
+
+            const computedStyle = window.getComputedStyle(element);
+            if (computedStyle.animationName === 'none' || computedStyle.animationDuration === '0s') {
+                cleanup();
+            }
+        });
+    }
+
+    function cleanupContainerAnimations() {
+        ONLOAD_ANIMATION_CONTAINERS.forEach((selector) => {
+            const container = document.querySelector(selector);
+            if (container) {
+                cleanupOnloadAnimations(container, true);
+            }
+        });
+    }
+
     // Code block folding logic
     function setupCodeFolding() {
         const codeBlocks = document.querySelectorAll('.expressive-code .frame');
@@ -165,9 +202,19 @@ const mainPanelTop = siteConfig.banner.enable
         });
     }
 
+    function initializePageEffects() {
+        setupCodeFolding();
+    }
+
     // Run on load and after Swup navigation
-    document.addEventListener('DOMContentLoaded', setupCodeFolding);
-    document.addEventListener('swup:contentReplaced', setupCodeFolding);
+    document.addEventListener('DOMContentLoaded', () => {
+        cleanupOnloadAnimations(document, false);
+        initializePageEffects();
+    });
+    document.addEventListener('swup:contentReplaced', () => {
+        cleanupContainerAnimations();
+        initializePageEffects();
+    });
 
     // Google Ads Anchor Ad support
     function initGoogleAnchorAdSupport() {
@@ -186,5 +233,6 @@ const mainPanelTop = siteConfig.banner.enable
     }
     document.addEventListener('DOMContentLoaded', initGoogleAnchorAdSupport);
     document.addEventListener('swup:contentReplaced', initGoogleAnchorAdSupport);
+    })();
 </script>
 </Layout>
