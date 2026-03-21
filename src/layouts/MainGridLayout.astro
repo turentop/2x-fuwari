@@ -113,13 +113,13 @@ const mainPanelTop = siteConfig.banner.enable
         {siteConfig.toc.enable && <div id="toc-wrapper" class:list={["transition absolute top-0 -right-[var(--toc-width)] w-[var(--toc-width)] flex items-center",
             {"toc-hide": siteConfig.banner.enable}]}
         >
-            <div id="toc-inner-wrapper" class="fixed top-14 bottom-[19rem] w-[var(--toc-width)] overflow-hidden">
-                <div id="toc" class="w-full h-full flex flex-col items-stretch justify-start px-2">
-                    <div class="h-8 w-full shrink-0"></div>
-                    <TOC headings={headings} class="h-full"></TOC>
-                    <div class="h-8 w-full shrink-0"></div>
+                <div id="toc-inner-wrapper" class="fixed top-14 max-h-[calc(100vh-theme(spacing.14)-theme(spacing.19))] w-[var(--toc-width)] overflow-hidden">
+                    <div id="toc" class="w-full h-full flex flex-col items-stretch justify-start px-2">
+                        <div class="h-8 w-full shrink-0"></div>
+                        <TOC headings={headings} class="h-full"></TOC>
+                        <div class="h-8 w-full shrink-0"></div>
+                    </div>
                 </div>
-            </div>
         </div>}
 
         <!-- #toc needs to exist for Swup to work normally -->
