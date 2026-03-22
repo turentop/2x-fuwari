@@ -11,23 +11,20 @@ import type {
 import { LinkPreset } from "./types/config";
 
 export const siteConfig: SiteConfig = {
-	title: "《二叉树树》官方网站",
-	subtitle: "AcoFork",
+	title: "《R-001》官方网站",
+	subtitle: "Turentop",
 	description:
-		"《二叉树树》是一个专注于IT/互联网技术分享与实践的个人技术博客，在这里你可以找到众多前沿技术的分享与实践经验。",
+		"《R-001》是一个专注于IT/互联网技术分享与实践的个人技术博客，在这里你可以找到众多前沿技术的分享与实践经验。",
 
 	keywords: [
-		"二叉树树",
-		"二叉树树官网",
-		"树",
-		"二叉树",
-		"二叉",
+		"R-001",
+		"R-001官网",
 		"博客",
-		"AcoFork Blog",
-		"AcoFork",
+		"Turentop Blog",
+		"Turentop",
 		"Blog",
-		"acofork blog",
-		"acofork",
+		"turentop blog",
+		"turentop",
 		"blog",
 	],
 	lang: "zh_CN", // 'en', 'zh_CN', 'zh_TW', 'ja', 'ko', 'es', 'th'
