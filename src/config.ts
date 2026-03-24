@@ -135,7 +135,7 @@ export const profileConfig: ProfileConfig = {
 		{
 			name: "GitHub",
 			icon: "github", // Local icon
-			url: "https://github.com/afoim",
+			url: "https://github.com/turentop",
 		},
 		{
 			name: "Folo",
@@ -153,8 +153,8 @@ export const licenseConfig: LicenseConfig = {
 
 export const imageFallbackConfig: ImageFallbackConfig = {
 	enable: false,
-	originalDomain: "https://eopfapi.acofork.com/pic?img=ua",
-	fallbackDomain: "https://eopfapi.acofork.com/pic?img=ua",
+	originalDomain: "https://eopfapi.dpdns.org/pic?img=ua",
+	fallbackDomain: "https://eopfapi.dpdns.org/pic?img=ua",
 };
 
 export const umamiConfig: UmamiConfig = {
@@ -170,7 +170,7 @@ export const expressiveCodeConfig: ExpressiveCodeConfig = {
 
 export const gitHubEditConfig: GitHubEditConfig = {
 	enable: true,
-	baseUrl: "https://github.com/afoim/fuwari/blob/main/src/content/posts",
+	baseUrl: "https://github.com/turentop/2x-fuwari/blob/main/src/content/posts",
 };
 
 // todoConfig removed from here
